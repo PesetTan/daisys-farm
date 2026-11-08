@@ -20,20 +20,10 @@
   function fruit(n) { return Array.from({length:n}, berry).join(''); }
   function tray(n, id = '') { return '<div class="painted-tray"><img class="tray-art" src="assets/harvest-tray.png" alt=""><div class="tray-produce"'+(id?' id="'+id+'"':'')+'>'+fruit(n)+'</div></div>'; }
   function icon(name) {
-    const shapes = {
-      home:'<path d="m7 29 25-21 25 21M14 26v30h36V26M27 56V39h11v17"/>',
-      play:'<path d="M19 10 48 32 19 54Z" fill="currentColor" stroke="none"/>',
-      next:'<path d="M10 32h42M36 15l17 17-17 17"/>',
-      restart:'<path d="M15 23a22 22 0 1 1-3 21M15 8v16H2"/>',
-      trace:'<path d="M17 15c25-14 38 12 14 17 27 2 13 32-14 18" stroke-dasharray="3 7"/><circle cx="17" cy="15" r="5" fill="currentColor"/>',
-      stand:'<path d="M9 28h46v27H9zM6 28l8-17h36l8 17M21 11l-4 17m15-17v17m11-17 4 17M8 42h48"/>',
-      check:'<path d="m13 32 13 13 26-29"/>',
-      hand:'<path d="M25 34V12a5 5 0 0 1 10 0v15l3-2 7 3 8 5v13L42 58H28L13 41a5 5 0 0 1 7-7l5 5Z" fill="#fff2cc"/><path d="M19 8l-4-4M40 8l4-4M11 19H5"/>'
-    };
-    return '<svg class="cue-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+shapes[name]+'</svg>';
+    return '<svg class="cue-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="assets/ui-icons.svg#'+name+'"></use></svg>';
   }
   function action(label, next) {
-    const pictures={pick:'play',stand:'stand',find:'next',reveal:'hand',trace:'trace',done:'check',restart:'restart',demo:'hand',home:'home'};
+    const pictures={restart:'restart',demo:'hand',home:'home'};
     return '<button class="picture-action" data-next="'+next+'" aria-label="'+label+'">'+icon(pictures[next]||'next')+'<span class="adult-label">'+label+'</span></button>';
   }
   function tapCue(selector) {
@@ -85,7 +75,7 @@
     } else if (stage === 'done') {
       const season=document.documentElement.dataset.season || 'autumn';
       const harvest=activity==='read'?'<div class="basket open"><img src="assets/basket-empty.png" alt=""><div class="basket-fruit">'+fruit(count)+'</div></div>':tray(count);
-      game.innerHTML = '<h2>'+({pick:'You picked them all!',find:'That’s the number!',read:'Look what’s inside!',trace:'You traced it!'})[activity]+'</h2><div class="success-scene"><div class="daisy-reward" role="img" aria-label="Daisy looks at you with a little tongue peeking out and wags her tail"><span class="reward-tail" aria-hidden="true"><img class="tail-static" src="assets/daisy-tail.png" alt=""><canvas class="tail-flex" width="900" height="510"></canvas></span><img class="celebration-dog" src="assets/daisy-happy-'+season+'.png" alt=""></div><div class="success-harvest"><div class="success-number">'+icon('check')+'<strong>'+count+'</strong></div>'+harvest+'</div></div><div class="actions">'+action('Play again','restart')+action('Choose a game','home')+'</div>';
+      game.innerHTML = '<h2>'+({pick:'You picked them all!',find:'That’s the number!',read:'Look what’s inside!',trace:'You traced it!'})[activity]+'</h2><div class="success-scene"><div class="daisy-reward" role="img" aria-label="Daisy looks at you with a little tongue peeking out and wags her tail"><span class="reward-tail" aria-hidden="true"><img class="tail-static" src="assets/daisy-tail.png" alt=""><canvas class="tail-flex" width="900" height="780"></canvas></span><img class="celebration-dog" src="assets/daisy-happy-v2-'+season+'.png" alt=""></div><div class="success-harvest"><div class="success-number">'+icon('check')+'<strong>'+count+'</strong></div>'+harvest+'</div></div><div class="actions">'+action('Play again','restart')+action('Choose a game','home')+'</div>';
       animateTail();
       look(activity==='read'?'You discovered '+count+' strawberries.':'You did it!');
     }
@@ -101,16 +91,16 @@
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
     let frame=0, disposed=false, start=null;
     function draw(elapsed, moving) {
-      ctx.clearRect(0,0,900,510);
+      ctx.clearRect(0,0,900,780);
       const envelope=moving?Math.min(1,elapsed/300):0;
       // Warp narrow texture strips along a continuous curve. The root stays
       // fixed while bend amplitude and phase delay grow toward the tip.
-      // 16% fuller around the root at y=345; its attachment stays fixed.
+      // Fuller cross-section with extra canvas padding; root remains at y=480.
       for(let x=0;x<900;x+=4) {
         const u=Math.max(0,(882-x)/882);
         const bend=76*Math.pow(u,1.7)*Math.sin(elapsed*Math.PI*2/820-u*1.25)*Math.max(0,envelope);
         const width=Math.min(4.5,900-x);
-        ctx.drawImage(image,x/900*image.naturalWidth,0,width/900*image.naturalWidth,image.naturalHeight,x,66.6+bend,width,348);
+        ctx.drawImage(image,x/900*image.naturalWidth,0,width/900*image.naturalWidth,image.naturalHeight,x,76.8+bend,width,504);
       }
     }
     function tick(now) {
@@ -226,9 +216,9 @@
   function updateSeason() {
     const season = document.documentElement.dataset.season || window.SeasonScene.seasonAt();
     document.querySelector('#season-name').textContent = season;
-    daisy.src = 'assets/daisy-' + season + '.png';
+    daisy.src = 'assets/daisy-guide-v2-' + season + '.png';
     const happy=game.querySelector('.celebration-dog');
-    if(happy) happy.src='assets/daisy-happy-'+season+'.png';
+    if(happy) happy.src='assets/daisy-happy-v2-'+season+'.png';
   }
   new MutationObserver(updateSeason).observe(document.documentElement, {attributes:true, attributeFilter:['data-season']});
   updateSeason();
