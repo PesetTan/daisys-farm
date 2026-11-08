@@ -95,7 +95,7 @@ main.celebrating { padding-left:5%; }
 /* The dark root overlaps the saddle at the left hip. Keeping the tail in
    front of the grass makes its connection visible instead of hiding the
    whole shaft and leaving only a disconnected tip above the reeds. */
-.reward-tail { position:absolute; z-index:2; width:32%; aspect-ratio:3; left:-6.36%; top:60.47%; pointer-events:none; mask-image:linear-gradient(to right,#000 0 94%,transparent 100%); }
+.reward-tail { position:absolute; z-index:2; width:32%; aspect-ratio:3; left:-.36%; top:60.47%; pointer-events:none; overflow:visible; }
 .tail-static { display:block; width:100%; height:auto; transform:scaleY(1.68); transform-origin:98% 80%; }
 .tail-flex { display:none; position:absolute; left:0; top:-80%; width:100%; height:260%; }
 .flex-ready .tail-static { visibility:hidden; }
@@ -135,3 +135,7 @@ header button svg { width:32px; height:32px; display:block; }
   #game[data-stage="done"] .actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
   #game[data-stage="done"] .picture-action { width:100%; }
 }
+
+/* Reuse the exact body pixels above the tail root, so it emerges from behind
+   the haunch. Do not mask the tail wrapper: that clips the bending canvas. */
+.celebration-dog.tail-root-cover { position:absolute; inset:0; z-index:3; clip-path:ellipse(7% 9% at 34% 69%); pointer-events:none; }

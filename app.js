@@ -75,7 +75,7 @@
     } else if (stage === 'done') {
       const season=document.documentElement.dataset.season || 'autumn';
       const harvest=activity==='read'?'<div class="basket open"><img src="assets/basket-empty.png" alt=""><div class="basket-fruit">'+fruit(count)+'</div></div>':tray(count);
-      game.innerHTML = '<h2>'+({pick:'You picked them all!',find:'That’s the number!',read:'Look what’s inside!',trace:'You traced it!'})[activity]+'</h2><div class="success-scene"><div class="daisy-reward" role="img" aria-label="Daisy looks at you with a little tongue peeking out and wags her tail"><span class="reward-tail" aria-hidden="true"><img class="tail-static" src="assets/daisy-tail.png" alt=""><canvas class="tail-flex" width="900" height="780"></canvas></span><img class="celebration-dog" src="assets/daisy-happy-v2-'+season+'.png" alt=""></div><div class="success-harvest"><div class="success-number">'+icon('check')+'<strong>'+count+'</strong></div>'+harvest+'</div></div><div class="actions">'+action('Play again','restart')+action('Choose a game','home')+'</div>';
+      game.innerHTML = '<h2>'+({pick:'You picked them all!',find:'That’s the number!',read:'Look what’s inside!',trace:'You traced it!'})[activity]+'</h2><div class="success-scene"><div class="daisy-reward" role="img" aria-label="Daisy looks at you with a little tongue peeking out and wags her tail"><span class="reward-tail" aria-hidden="true"><img class="tail-static" src="assets/daisy-tail.png" alt=""><canvas class="tail-flex" width="900" height="780"></canvas></span><img class="celebration-dog" src="assets/daisy-happy-v2-'+season+'.png" alt=""><img class="celebration-dog tail-root-cover" src="assets/daisy-happy-v2-'+season+'.png" alt="" aria-hidden="true"></div><div class="success-harvest"><div class="success-number">'+icon('check')+'<strong>'+count+'</strong></div>'+harvest+'</div></div><div class="actions">'+action('Play again','restart')+action('Choose a game','home')+'</div>';
       animateTail();
       look(activity==='read'?'You discovered '+count+' strawberries.':'You did it!');
     }
@@ -217,8 +217,7 @@
     const season = document.documentElement.dataset.season || window.SeasonScene.seasonAt();
     document.querySelector('#season-name').textContent = season;
     daisy.src = 'assets/daisy-guide-v2-' + season + '.png';
-    const happy=game.querySelector('.celebration-dog');
-    if(happy) happy.src='assets/daisy-happy-v2-'+season+'.png';
+    game.querySelectorAll('.celebration-dog').forEach(happy=>{happy.src='assets/daisy-happy-v2-'+season+'.png';});
   }
   new MutationObserver(updateSeason).observe(document.documentElement, {attributes:true, attributeFilter:['data-season']});
   updateSeason();
