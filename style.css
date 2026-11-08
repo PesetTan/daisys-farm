@@ -41,3 +41,46 @@
   .plant-leaves { width:150%; left:-25%; }
   .actions { margin-top:12px; }
 }
+
+/* Pictures carry the instruction; small labels remain for grown-ups. */
+.cue-icon { width:56px; height:56px; flex:none; vertical-align:middle; }
+.picture-action { position:relative; display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; min-width:100px; }
+.adult-label { display:block; font-size:15px; line-height:1.25; font-weight:normal; }
+.tiles button { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; min-height:125px; }
+.tiles .produce,.tile-art { width:92px; height:72px; object-fit:contain; }
+.tile-number { font-size:36px; font-weight:bold; }
+#game[data-stage="home"] > p { display:none; }
+#game[data-stage="home"] h1 { margin-bottom:12px; }
+#game[data-stage="home"] > .picture-action { min-width:170px; }
+#game:not([data-stage="home"]) h2 { background:none; padding:0; font-size:20px; font-weight:normal; margin:0 auto 10px; }
+.picture-goal { display:flex; align-items:center; justify-content:center; gap:8px; margin:0 auto 8px; background:#ffe19a; border-radius:40px; padding:6px 20px; width:fit-content; color:#41551f; }
+.picture-goal strong { font-size:58px; line-height:1; }
+.picture-goal .produce { width:50px; height:58px; }
+.picture-goal > img:not(.produce) { width:94px; height:54px; object-fit:contain; }
+.picture-goal .cue-icon { width:36px; height:36px; }
+.tap-cue { pointer-events:none; position:absolute; right:-10px; bottom:-15px; z-index:5; color:#51652f; filter:drop-shadow(0 2px 2px #5d4b2233); transform:rotate(-18deg); animation:tap-hint 2.8s ease-in-out 3; }
+.tap-cue .cue-icon { width:46px; height:46px; }
+@keyframes tap-hint { 0%,60%,100% { transform:translateY(0) rotate(-18deg); } 20%,40% { transform:translateY(-7px) rotate(-12deg); } 30%,50% { transform:translateY(0) rotate(-18deg) scale(.94); } }
+.choices button { position:relative; }
+.choice-prompt { margin:-12px auto 8px; color:#657c3e; }
+.choice-prompt .cue-icon { width:42px; height:42px; }
+.try-again { opacity:.5; }
+#hint { font-size:15px; margin-bottom:0; }
+.trace-start { fill:#fff7d9; stroke:#566a30; stroke-width:3; }
+.trace-finger { fill:#ffe19a; stroke:#566a30; stroke-width:3; pointer-events:none; }
+#guide { font-size:13px; }
+@media(max-width:650px) {
+  .tiles { gap:10px; margin-top:16px; }
+  .tiles button { min-height:105px; padding:10px; }
+  .picture-action { padding:10px 22px; }
+  #game:not([data-stage="home"]) h2 { font-size:17px; }
+  .picture-goal { padding:5px 15px; }
+  .picture-goal strong { font-size:48px; }
+  .picture-goal .produce { width:40px; height:48px; }
+  .tap-cue { right:-5px; bottom:-10px; }
+  .tap-cue .cue-icon { width:38px; height:38px; }
+  #game[data-stage="find"] .painted-tray { max-width:260px; }
+}
+#game[data-stage="trace"] [data-next="done"] { background:transparent; min-width:0; padding:8px 14px; }
+#game[data-stage="trace"] [data-next="done"] .cue-icon { width:28px; height:28px; }
+@media(max-width:650px) { .bed { max-width:310px; } .harvest .painted-tray { max-width:260px; } }
