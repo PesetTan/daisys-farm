@@ -15,7 +15,7 @@
     5: 'M195 40 L65 40 L60 140 C220 90 240 290 55 255'
   };
   function berry() {
-    return '<svg class="produce" viewBox="0 0 100 120" aria-hidden="true"><path fill="#b84232" d="M13 43 Q9 20 47 25 Q91 18 88 48 L70 94 Q50 125 32 98Z"/><path fill="#db6141" d="M15 45L42 30 61 42 45 99 29 80Z"/><path fill="#913b38" d="M65 44L88 43 70 93 49 112Z"/><path fill="#648346" d="M48 35L18 20 38 20 43 4 54 24 78 10 67 29 89 35 59 40Z"/><path stroke="#e7bc68" stroke-width="3" d="M28 49l2 6m18-9l2 6m21 0l-2 6m-31 9l2 6m17-5l-2 6m-10 10l2 6"/></svg>';
+    return '<img class="produce" src="assets/strawberry.png" alt="">';
   }
   function fruit(n) { return Array.from({length:n}, berry).join(''); }
   function action(label, next) { return '<button data-next="'+next+'">'+label+'</button>'; }
@@ -48,10 +48,10 @@
       game.innerHTML = '<h2>Find '+count+'</h2><div class="choices">'+choices.map(n=>'<button class="number" data-answer="'+n+'">'+n+'</button>').join('')+'</div><p id="hint">Choose the sign for our strawberries.</p>';
       look('Choose a number sign.', '[data-answer]');
     } else if (stage === 'read') {
-      game.innerHTML = '<h2>What number is this?</h2><div class="number">'+count+'</div><button class="basket" data-next="reveal" aria-label="Open basket"><div class="lid"></div></button><div class="actions">'+action('Open basket','reveal')+'</div>';
+      game.innerHTML = '<h2>What number is this?</h2><div class="number">'+count+'</div><button class="basket closed" data-next="reveal" aria-label="Open basket"><img src="assets/basket-closed.png" alt="Closed painted basket"></button><div class="actions">'+action('Open basket','reveal')+'</div>';
       look('Say the number, then open the basket.', '.basket');
     } else if (stage === 'reveal') {
-      game.innerHTML = '<h2>'+count+' strawberries!</h2><div class="number">'+count+'</div><div class="basket">'+fruit(count)+'</div><div class="actions">'+action(standalone?'Play again':'Trace the sign',standalone?'restart':'trace')+'</div>';
+      game.innerHTML = '<h2>'+count+' strawberries!</h2><div class="number">'+count+'</div><div class="basket open"><img src="assets/basket-empty.png" alt=""><div class="basket-fruit">'+fruit(count)+'</div></div><div class="actions">'+action(standalone?'Play again':'Trace the sign',standalone?'restart':'trace')+'</div>';
       look('Our strawberries are all here.');
     } else if (stage === 'trace') {
       game.innerHTML = '<h2>Trace the '+count+'</h2><svg id="trace" viewBox="0 0 250 300" aria-label="Trace number '+count+'"><path class="trace-base" d="'+paths[count]+'"/><path class="trace-progress" d="'+paths[count]+'"/></svg><div class="actions">'+action('Show me','demo')+action('Finish together','done')+'</div>';
@@ -108,5 +108,11 @@
   });
   document.querySelector('#home').onclick=()=>show('home');
   show('home');
-  setInterval(()=>{document.querySelector('#season-name').textContent=document.documentElement.dataset.season || window.SeasonScene.seasonAt();},1000);
+  function updateSeason() {
+    const season = document.documentElement.dataset.season || window.SeasonScene.seasonAt();
+    document.querySelector('#season-name').textContent = season;
+    daisy.src = 'assets/daisy-' + season + '.png';
+  }
+  new MutationObserver(updateSeason).observe(document.documentElement, {attributes:true, attributeFilter:['data-season']});
+  updateSeason();
 })();
