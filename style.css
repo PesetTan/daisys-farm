@@ -95,12 +95,11 @@ main.celebrating { padding-left:5%; }
 /* The dark root overlaps the saddle at the left hip. Keeping the tail in
    front of the grass makes its connection visible instead of hiding the
    whole shaft and leaving only a disconnected tip above the reeds. */
-.reward-tail { position:absolute; z-index:2; width:40%; height:auto; left:-1.2%; top:49.3%; transform-origin:98% 80%; transform:rotate(0deg); animation:daisy-wag .8s ease-in-out 6; }
-@keyframes daisy-wag {
-  0%,100% { transform:rotate(0deg) scaleX(1); }
-  25% { transform:rotate(-7deg) scaleX(.94); }
-  75% { transform:rotate(8deg) scaleX(.98); }
-}
+.reward-tail { position:absolute; z-index:2; width:40%; aspect-ratio:3; left:-1.2%; top:49.3%; pointer-events:none; }
+.tail-static { display:block; width:100%; height:auto; }
+.tail-flex { display:none; position:absolute; left:0; top:-35%; width:100%; height:170%; }
+.flex-ready .tail-static { visibility:hidden; }
+.flex-ready .tail-flex { display:block; }
 .success-number { display:flex; justify-content:center; align-items:center; gap:14px; color:#526a2a; }
 .success-number strong { font-size:clamp(80px,12vw,140px); line-height:1.1; }
 .success-number .cue-icon { width:42px; height:42px; }

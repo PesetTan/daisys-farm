@@ -85,11 +85,51 @@
     } else if (stage === 'done') {
       const season=document.documentElement.dataset.season || 'autumn';
       const harvest=activity==='read'?'<div class="basket open"><img src="assets/basket-empty.png" alt=""><div class="basket-fruit">'+fruit(count)+'</div></div>':tray(count);
-      game.innerHTML = '<h2>'+({pick:'You picked them all!',find:'That’s the number!',read:'Look what’s inside!',trace:'You traced it!'})[activity]+'</h2><div class="success-scene"><div class="daisy-reward" role="img" aria-label="Daisy looks at you with a little tongue peeking out and wags her tail"><img class="reward-tail" src="assets/daisy-tail.png" alt=""><img class="celebration-dog" src="assets/daisy-happy-'+season+'.png" alt=""></div><div class="success-harvest"><div class="success-number">'+icon('check')+'<strong>'+count+'</strong></div>'+harvest+'</div></div><div class="actions">'+action('Play again','restart')+action('Choose a game','home')+'</div>';
+      game.innerHTML = '<h2>'+({pick:'You picked them all!',find:'That’s the number!',read:'Look what’s inside!',trace:'You traced it!'})[activity]+'</h2><div class="success-scene"><div class="daisy-reward" role="img" aria-label="Daisy looks at you with a little tongue peeking out and wags her tail"><span class="reward-tail" aria-hidden="true"><img class="tail-static" src="assets/daisy-tail.png" alt=""><canvas class="tail-flex" width="900" height="510"></canvas></span><img class="celebration-dog" src="assets/daisy-happy-'+season+'.png" alt=""></div><div class="success-harvest"><div class="success-number">'+icon('check')+'<strong>'+count+'</strong></div>'+harvest+'</div></div><div class="actions">'+action('Play again','restart')+action('Choose a game','home')+'</div>';
+      animateTail();
       look(activity==='read'?'You discovered '+count+' strawberries.':'You did it!');
     }
     pictureGuide();
     requestAnimationFrame(()=>game.classList.add('arrive'));
+  }
+  function animateTail() {
+    const tail=game.querySelector('.reward-tail');
+    const image=tail.querySelector('.tail-static');
+    const canvas=tail.querySelector('.tail-flex');
+    const ctx=canvas.getContext('2d');
+    if(!ctx) return;
+    const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+    let frame=0, disposed=false, start=null;
+    function draw(elapsed, moving) {
+      ctx.clearRect(0,0,900,510);
+      const envelope=moving?Math.min(1,elapsed/300,(4800-elapsed)/600):0;
+      // Warp narrow texture strips along a continuous curve. The root stays
+      // fixed while bend amplitude and phase delay grow toward the tip.
+      for(let x=0;x<900;x+=4) {
+        const u=Math.max(0,(882-x)/882);
+        const bend=76*Math.pow(u,1.7)*Math.sin(elapsed*Math.PI*2/820-u*1.25)*Math.max(0,envelope);
+        const width=Math.min(4.5,900-x);
+        ctx.drawImage(image,x/900*image.naturalWidth,0,width/900*image.naturalWidth,image.naturalHeight,x,105+bend,width,300);
+      }
+    }
+    function tick(now) {
+      if(disposed) return;
+      if(start===null) start=now;
+      const elapsed=now-start;
+      if(reduced.matches || elapsed>=4800){draw(0,false);return;}
+      draw(elapsed,true);
+      frame=requestAnimationFrame(tick);
+    }
+    function begin() {
+      if(disposed || !image.naturalWidth) return;
+      draw(0,false);tail.classList.add('flex-ready');
+      if(!reduced.matches) frame=requestAnimationFrame(tick);
+    }
+    function stopMotion() { if(reduced.matches){cancelAnimationFrame(frame);draw(0,false);} }
+    reduced.addEventListener('change',stopMotion);
+    image.addEventListener('load',begin,{once:true});
+    if(image.complete){image.removeEventListener('load',begin);begin();}
+    cleanup=()=>{disposed=true;cancelAnimationFrame(frame);image.removeEventListener('load',begin);reduced.removeEventListener('change',stopMotion);};
   }
   function tracing() {
     const svg=game.querySelector('#trace'), base=svg.querySelector('.trace-base'), progress=svg.querySelector('.trace-progress');
