@@ -1,3 +1,5 @@
+> Current scope update: Each game is an independent event. The menu has four picture tiles and no “Play with Daisy” flow. Replay repeats the selected activity. Successful completion shows front-facing Daisy with a tongue peek and a brief tail wag, matched to the season. Tracing no longer offers a skip-to-success button. Earlier connected-flow notes below are retained as design history and are superseded by this update.
+
 # Daisy's Farm
 
 ## Goal

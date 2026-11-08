@@ -84,3 +84,30 @@
 #game[data-stage="trace"] [data-next="done"] { background:transparent; min-width:0; padding:8px 14px; }
 #game[data-stage="trace"] [data-next="done"] .cue-icon { width:28px; height:28px; }
 @media(max-width:650px) { .bed { max-width:310px; } .harvest .painted-tray { max-width:260px; } }
+
+/* A short, personal celebration ends each independent activity. */
+main.celebrating { padding-left:5%; }
+#daisy[hidden] { display:none; }
+#game[data-stage="done"] { max-width:900px; }
+.success-scene { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:12px; }
+.daisy-reward { position:relative; width:100%; max-width:340px; margin:auto; aspect-ratio:1; isolation:isolate; }
+.celebration-dog { position:relative; width:100%; height:100%; object-fit:contain; z-index:1; }
+.reward-tail { position:absolute; width:65%; height:auto; left:-10%; top:50%; transform:rotate(32deg); transform-origin:95% 85%; animation:daisy-wag .42s ease-in-out 12 alternate; }
+@keyframes daisy-wag { from { transform:rotate(20deg); } to { transform:rotate(45deg); } }
+.success-number { display:flex; justify-content:center; align-items:center; gap:14px; color:#526a2a; }
+.success-number strong { font-size:clamp(80px,12vw,140px); line-height:1.1; }
+.success-number .cue-icon { width:42px; height:42px; }
+.success-harvest .painted-tray { max-width:350px; }
+.celebrating #guide { position:static; margin:12px auto 0; background:none; color:var(--ws-canvas); text-align:center; }
+.celebrating { flex-direction:column; }
+@media(max-width:650px) {
+  main.celebrating { padding:22px 14px 35px; }
+  .success-scene { grid-template-columns:1fr; gap:0; }
+  .daisy-reward { max-width:235px; }
+  .success-harvest { display:flex; align-items:center; justify-content:center; gap:8px; }
+  .success-number { gap:4px; }
+  .success-number strong { font-size:66px; }
+  .success-number .cue-icon { width:28px; height:28px; }
+  .success-harvest .painted-tray,.success-harvest .basket { width:170px; min-height:0; }
+  #game[data-stage="done"] .actions { gap:8px; }
+}
