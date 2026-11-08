@@ -139,3 +139,25 @@ header button svg { width:32px; height:32px; display:block; }
 /* Reuse the exact body pixels above the tail root, so it emerges from behind
    the haunch. Do not mask the tail wrapper: that clips the bending canvas. */
 .celebration-dog.tail-root-cover { position:absolute; inset:0; z-index:3; clip-path:ellipse(7% 9% at 34% 69%); pointer-events:none; }
+
+/* Six to ten items form two readable rows, with touch-sized plants. */
+.many-fruit .plants { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); grid-template-rows:repeat(2,1fr); inset:0 7% 16%; }
+.many-fruit .bed { aspect-ratio:1.25; }
+.many-fruit .plant-leaves { width:140%; left:-20%; height:100%; }
+.many-fruit .berry { height:65%; min-height:44px; }
+.many-fruit .tray-produce { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); gap:0 3px; }
+.many-fruit .tray-produce .produce { width:100%; height:100%; min-height:0; }
+.many-fruit .basket-fruit { left:17%; right:17%; top:23%; height:40%; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); grid-template-rows:repeat(2,minmax(0,1fr)); }
+.many-fruit .basket-fruit .produce { width:100%; height:100%; }
+@media(max-width:850px) {
+  .many-fruit .harvest { grid-template-columns:1fr; }
+  .many-fruit .bed { width:100%; max-width:380px; margin:auto; }
+  .many-fruit #tally { padding:0; }
+}
+@media(max-width:650px) {
+  .many-fruit .success-harvest { flex-wrap:wrap; }
+  .many-fruit .success-harvest .painted-tray,.many-fruit .success-harvest .basket { width:260px; }
+}
+
+.many-fruit .soil-art { height:55%; }
+.many-fruit .soil-back-row { bottom:48%; }

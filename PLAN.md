@@ -4,7 +4,7 @@
 
 ## Goal
 
-Make a web app for phones, tablets, and desktop browsers for a 2½-year-old who can already say the numbers up to 20 and is learning what they look like. The first version teaches **1–5** through four short games in one farm. She hears “three,” sees **3**, counts three pieces of produce, and can trace the same shape with her finger. Recognizing a numeral when it appears on its own is the main learning goal. [IES early-math practice guide, p. 21](https://ies.ed.gov/ncee/wwc/Docs/practiceguide/early_math_pg_111313.pdf)
+Make a web app for phones, tablets, and desktop browsers for a 2½-year-old who can already say the numbers up to 20 and is learning what they look like. The first version teaches **1–10** through four short games in one farm. She hears “three,” sees **3**, counts three pieces of produce, and can trace the same shape with her finger. Recognizing a numeral when it appears on its own is the main learning goal. [IES early-math practice guide, p. 21](https://ies.ed.gov/ncee/wwc/Docs/practiceguide/early_math_pg_111313.pdf)
 
 ## Bring Windswept to the farm
 
@@ -30,7 +30,7 @@ Find the Number shows “Play again” after the round is complete. Use the list
 
 [Pick and pack](mockups/flow-harvest.png) · [Take to the stand and find the sign](mockups/flow-stand.png) · [Open the basket and trace](mockups/flow-reveal.png)
 
-**Play** starts a guided trip. Choose one quantity from 1–5 and one crop at the beginning and carry them through the whole trip.
+**Play** starts a guided trip. Choose one quantity from 1–10 and one crop at the beginning and carry them through the whole trip.
 
 1. **Pick and Count.** Start at a painted garden bed with ripe strawberries on the plants and an empty tray beside them. Each tap moves one berry to the tray and Daisy counts it aloud. After the last berry, Daisy says “Three strawberries!” and the **3** appears. Tap **Take to the stand** to carry that tray forward.
 2. **Find the Number.** At the stand, Daisy asks for the matching number sign. She picks **3** from two equally styled signs. The chosen sign goes onto the basket, and the strawberries from her tray go inside. Close the lid before the next step.
@@ -62,7 +62,7 @@ Use a low, lidded reed basket in both states. Paint it with broad straw and ochr
 
 1. Build a static single-page app using HTML, CSS, and JavaScript. Use one column on phones and a wider play area with controls beside it where space allows. Let short screens scroll naturally. Support portrait and landscape without requiring rotation. Keep the same back and listen buttons in every game, with visible keyboard focus and at least 60 CSS pixels of touch area for child controls.
 2. Use native buttons for produce, number choices, and other tap actions so they also work with a mouse and keyboard. Share round data for the target numeral, produce, and visible prompts. Bundle artwork and visible prompts. Audio is deferred at the user's request. Show each count visibly during picking.
-3. Build the tracing board as a responsive SVG with ordered stroke paths for 1–5. Use Pointer Events for touch, mouse, and pen. Capture the active pointer, convert screen coordinates into SVG coordinates, and advance through ordered checkpoints within a forgiving corridor. Scale the corridor with the board. Apply `touch-action: none` only on the tracing surface so the page still scrolls around it. On release or cancellation, keep progress and let her resume near the last point. Offer a keyboard-accessible demonstration and a way back to the other games.
+3. Build the tracing board as a responsive SVG with ordered stroke paths for 1–10. Use Pointer Events for touch, mouse, and pen. Capture the active pointer, convert screen coordinates into SVG coordinates, and advance through ordered checkpoints within a forgiving corridor. Scale the corridor with the board. Apply `touch-action: none` only on the tracing surface so the page still scrolls around it. On release or cancellation, keep progress and let her resume near the last point. Offer a keyboard-accessible demonstration and a way back to the other games.
 4. Keep the app client-side with no accounts, microphone access, ads, or analytics. Package it for static HTTPS hosting and cache the app shell, art, and prompts with a versioned service worker for offline use after the first successful online load. Use summer for the first build. Extend the range to **6–9**, then **0** with an empty basket, then **10–20**. Add the other Windswept seasons once the games work well across screens.
 
 ## Check it on phones, tablets, and desktop
@@ -71,7 +71,7 @@ Use a low, lidded reed basket in both states. Paint it with broad straw and ochr
 
 - Test on iPhone and iPad Safari, Android Chrome, and desktop Safari, Chrome, and Firefox. Check both orientations on mobile and tablet, plus narrow and wide desktop windows. Verify that numbers and controls stay readable and easy to reach without horizontal scrolling or the artwork blocking a tap.
 - Run a full guided trip and verify that the chosen numeral, crop, and quantity carry through all four stages.
-- Run every game with each of 1–5. Check that repeated taps never add the same object twice, spoken counts stay in order, and the numeral matches the total. Check that replay, retry, and back work mid-round and that keyboard focus is visible.
+- Run every game with each of 1–10. Check that repeated taps never add the same object twice, spoken counts stay in order, and the numeral matches the total. Check that replay, retry, and back work mid-round and that keyboard focus is visible.
 - Trace with a finger and a mouse. Check short strokes, fast strokes, finger lifts, pointer cancellation, small deviations, and skipped sections. A scribble across the board cannot finish the numeral. Confirm that the board holds the gesture while the surrounding page still scrolls.
 - Check contrast, screen-reader names for controls and signs, and reduced motion. Confirm that no audio plays. Offline caching is a future enhancement.
 

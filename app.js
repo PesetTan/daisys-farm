@@ -2,6 +2,7 @@
   const game = document.querySelector('#game');
   const daisy = document.querySelector('#daisy');
   const guide = document.querySelector('#guide');
+  const maxCount = 10;
   let count = 3;
   let picked = new Set();
   let stage = 'home';
@@ -12,7 +13,12 @@
     2: 'M50 80 C55 10 195 10 190 85 C185 135 60 200 50 265 L195 265',
     3: 'M55 50 C180 -5 230 115 120 145 C230 150 210 295 50 255',
     4: 'M160 35 L45 190 L205 190 L160 190 L160 270',
-    5: 'M195 40 L65 40 L60 140 C220 90 240 290 55 255'
+    5: 'M195 40 L65 40 L60 140 C220 90 240 290 55 255',
+    6: 'M180 40 C80 45 45 140 55 215 C65 285 195 285 195 205 C195 125 80 125 55 205',
+    7: 'M45 40 L205 40 L95 265',
+    8: 'M125 145 C20 100 45 30 125 35 C205 30 230 100 125 145 C15 195 40 270 125 265 C210 270 235 195 125 145',
+    9: 'M195 105 C195 15 55 15 55 105 C55 185 195 185 195 105 C195 190 155 245 70 265',
+    10: ['M35 70 L65 40 L65 260', 'M170 40 C100 40 100 260 170 260 C240 260 240 40 170 40']
   };
   function berry() {
     return '<img class="produce" src="assets/strawberry.png" alt="">';
@@ -52,6 +58,7 @@
     cleanup(); cleanup = () => {};
     stage = next;
     game.dataset.stage = stage;
+    game.classList.toggle('many-fruit', count > 5);
     daisy.hidden = stage === 'done';
     document.querySelector('main').classList.toggle('celebrating',stage==='done');
     game.classList.remove('arrive');
@@ -59,10 +66,10 @@
       game.innerHTML = '<h1>Daisy’s Farm</h1><div class="tiles">'+['pick','find','read','trace'].map((s,i)=>'<button data-practice="'+s+'">'+(s==='pick'?berry():s==='read'?'<img class="tile-art" src="assets/basket-closed.png" alt="">':s==='find'?'<span class="tile-number" aria-hidden="true">1 2 3</span>':icon('trace'))+'<span class="adult-label">'+['Pick and Count','Find the Number','Read the Sign','Trace the Sign'][i]+'</span></button>').join('')+'</div>';
       look('Choose a game.');
     } else if (stage === 'pick') {
-      game.innerHTML = '<h2>Pick '+count+' strawberries</h2><div class="harvest"><div class="bed" aria-label="Strawberry patch"><img class="soil-art" src="assets/soil-tray.png" alt=""><div class="plants">'+Array.from({length:count},(_,i)=>'<div class="plant" style="--lean:'+(i%2?'-2deg':'2deg')+'"><img class="plant-leaves" src="assets/strawberry-plant.png" alt=""><button class="berry" data-pick="'+i+'" aria-label="Pick strawberry '+(i+1)+'">'+berry()+'</button></div>').join('')+'</div></div><div class="number" id="tally" aria-label="Strawberries picked">0</div>'+tray(0,'tray')+'</div><div class="actions" id="continue"></div>';
+      game.innerHTML = '<h2>Pick '+count+' strawberries</h2><div class="harvest"><div class="bed" aria-label="Strawberry patch"><img class="soil-art" src="assets/soil-tray.png" alt="">'+(count>5?'<img class="soil-art soil-back-row" src="assets/soil-tray.png" alt="">':'')+'<div class="plants">'+Array.from({length:count},(_,i)=>'<div class="plant" style="--lean:'+(i%2?'-2deg':'2deg')+'"><img class="plant-leaves" src="assets/strawberry-plant.png" alt=""><button class="berry" data-pick="'+i+'" aria-label="Pick strawberry '+(i+1)+'">'+berry()+'</button></div>').join('')+'</div></div><div class="number" id="tally" aria-label="Strawberries picked">0</div>'+tray(0,'tray')+'</div><div class="actions" id="continue"></div>';
       look('Tap a ripe strawberry.', '[data-pick]');
     } else if (stage === 'find') {
-      const wrong = count === 5 ? 2 : count+1;
+      const wrong = count === maxCount ? count-1 : count+1;
       const choices = Math.random()<.5 ? [count,wrong] : [wrong,count];
       game.innerHTML = '<h2>Find the number</h2>'+tray(count)+'<div class="choice-prompt" aria-hidden="true">'+icon('hand')+'</div><div class="choices">'+choices.map(n=>'<button class="number" data-answer="'+n+'">'+n+'</button>').join('')+'</div><p id="hint">Choose the sign for our strawberries.</p>';
       look('Choose a number sign.', '[data-answer]');
@@ -70,7 +77,7 @@
       game.innerHTML = '<h2>What number is this?</h2><div class="number">'+count+'</div><button class="basket closed" data-next="done" aria-label="Open basket"><img src="assets/basket-closed.png" alt="Closed painted basket"></button>';
       look('Say the number, then open the basket.', '.basket');
     } else if (stage === 'trace') {
-      game.innerHTML = '<h2>Trace the '+count+'</h2><svg id="trace" viewBox="0 0 250 300" aria-label="Trace number '+count+'"><path class="trace-base" d="'+paths[count]+'"/><path class="trace-progress" d="'+paths[count]+'"/></svg><div class="actions">'+action('Show me','demo')+'</div>';
+      game.innerHTML = '<h2>Trace the '+count+'</h2><svg id="trace" viewBox="0 0 250 300" aria-label="Trace number '+count+'">'+[].concat(paths[count]).map(d=>'<path class="trace-base" d="'+d+'"/>').join('')+[].concat(paths[count]).map(d=>'<path class="trace-progress" d="'+d+'"/>').join('')+'</svg><div class="actions">'+action('Show me','demo')+'</div>';
       tracing(); look('Follow the golden trail.', '#trace');
     } else if (stage === 'done') {
       const season=document.documentElement.dataset.season || 'autumn';
@@ -128,8 +135,10 @@
     cleanup=()=>{disposed=true;cancelAnimationFrame(frame);image.removeEventListener('load',begin);reduced.removeEventListener('change',stopMotion);};
   }
   function tracing() {
-    const svg=game.querySelector('#trace'), base=svg.querySelector('.trace-base'), progress=svg.querySelector('.trace-progress');
-    const length=base.getTotalLength();
+    const svg=game.querySelector('#trace');
+    const bases=[...svg.querySelectorAll('.trace-base')], progresses=[...svg.querySelectorAll('.trace-progress')];
+    let stroke=0, base=bases[0], progress=progresses[0], length=base.getTotalLength();
+    progresses.forEach((path,i)=>{path.style.strokeDasharray=bases[i].getTotalLength();path.style.strokeDashoffset=bases[i].getTotalLength();});
     const start=base.getPointAtLength(0);
     svg.insertAdjacentHTML('beforeend','<circle class="trace-start" cx="'+start.x+'" cy="'+start.y+'" r="12"/><circle class="trace-finger" cx="'+start.x+'" cy="'+start.y+'" r="9"/>');
     const finger=svg.querySelector('.trace-finger');
@@ -154,7 +163,15 @@
       if(length-distance<16 && Math.hypot(p.x-end.x,p.y-end.y)<20) distance=length;
       progress.style.strokeDashoffset=length-distance;
       placeFinger(distance);
-      if(distance>=length) show('done');
+      if(distance>=length) {
+        if(stroke===bases.length-1) {show('done');return;}
+        // Lift and start the next digit; never draw a connecting line in 10.
+        pointer=null; stroke++; base=bases[stroke]; progress=progresses[stroke];
+        length=base.getTotalLength(); distance=0;
+        const nextStart=base.getPointAtLength(0), marker=svg.querySelector('.trace-start');
+        marker.setAttribute('cx',nextStart.x);marker.setAttribute('cy',nextStart.y);
+        placeFinger(0);
+      }
     }
     svg.onpointerdown=e=>{clearInterval(timer);progress.style.strokeDashoffset=length-distance;placeFinger(distance);pointer=e.pointerId;svg.setPointerCapture(pointer);move(e);};
     svg.onpointermove=move;
@@ -208,7 +225,7 @@
     }
     let next=button.dataset.next;
     if(next==='demo')return;
-    if(next==='restart'){count=count%5+1;picked=new Set();next=activity;}
+    if(next==='restart'){count=count%maxCount+1;picked=new Set();next=activity;}
     if(next) show(next);
   });
   document.querySelector('#home').onclick=()=>show('home');
