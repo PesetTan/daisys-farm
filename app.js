@@ -102,21 +102,22 @@
     let frame=0, disposed=false, start=null;
     function draw(elapsed, moving) {
       ctx.clearRect(0,0,900,510);
-      const envelope=moving?Math.min(1,elapsed/300,(4800-elapsed)/600):0;
+      const envelope=moving?Math.min(1,elapsed/300):0;
       // Warp narrow texture strips along a continuous curve. The root stays
       // fixed while bend amplitude and phase delay grow toward the tip.
+      // 16% fuller around the root at y=345; its attachment stays fixed.
       for(let x=0;x<900;x+=4) {
         const u=Math.max(0,(882-x)/882);
         const bend=76*Math.pow(u,1.7)*Math.sin(elapsed*Math.PI*2/820-u*1.25)*Math.max(0,envelope);
         const width=Math.min(4.5,900-x);
-        ctx.drawImage(image,x/900*image.naturalWidth,0,width/900*image.naturalWidth,image.naturalHeight,x,105+bend,width,300);
+        ctx.drawImage(image,x/900*image.naturalWidth,0,width/900*image.naturalWidth,image.naturalHeight,x,66.6+bend,width,348);
       }
     }
     function tick(now) {
       if(disposed) return;
       if(start===null) start=now;
       const elapsed=now-start;
-      if(reduced.matches || elapsed>=4800){draw(0,false);return;}
+      if(reduced.matches){draw(0,false);return;}
       draw(elapsed,true);
       frame=requestAnimationFrame(tick);
     }
@@ -125,7 +126,12 @@
       draw(0,false);tail.classList.add('flex-ready');
       if(!reduced.matches) frame=requestAnimationFrame(tick);
     }
-    function stopMotion() { if(reduced.matches){cancelAnimationFrame(frame);draw(0,false);} }
+    function stopMotion() {
+      cancelAnimationFrame(frame);
+      if(disposed || !image.naturalWidth) return;
+      if(reduced.matches) draw(0,false);
+      else {start=null;frame=requestAnimationFrame(tick);}
+    }
     reduced.addEventListener('change',stopMotion);
     image.addEventListener('load',begin,{once:true});
     if(image.complete){image.removeEventListener('load',begin);begin();}

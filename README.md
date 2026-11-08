@@ -20,4 +20,4 @@ Picture buttons and tap-hand hints guide play without requiring reading. Picking
 
 ## Completion feedback
 
-Completing an activity brings Daisy into the game panel, looking at the child with a small tongue peek and a short tail wag. All four seasonal reward portraits retain the matching marsh palette. Picking celebrates the completed harvest, matching celebrates a correct answer, and tracing celebrates reaching the end of the stroke. The basket activity celebrates discovery; without audio input, it does not assess a spoken answer. Reduced-motion users see the happy pose without the wag.
+Completing an activity brings Daisy into the game panel, looking at the child with a small tongue peek and a continuous tail wag while the success screen is open. All four seasonal reward portraits retain the matching marsh palette. Picking celebrates the completed harvest, matching celebrates a correct answer, and tracing celebrates reaching the end of the stroke. The basket activity celebrates discovery; without audio input, it does not assess a spoken answer. Reduced-motion users see the happy pose without the wag.
