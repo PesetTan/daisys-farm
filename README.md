@@ -12,4 +12,4 @@ All imagery is served locally. The project contains no audio or microphone integ
 
 Seasonal scene modules and generated landscape assets adapted from the owner's Tan Family / Windswept project. Four seasonal Daisy sprites generated from the approved Daisy’s Farm concept, with matching light and marsh grasses. Personal photographs are excluded. Strawberries and baskets use painted raster artwork with visible seeds, leaves, woven structure, and broad brushwork.
 
-The mockups record design development. The working app is an initial implementation with painted produce and baskets; planting beds and the stand currently use CSS props.
+The mockups record design development. The working app is an initial implementation with painted produce and baskets; planting beds and harvest trays use separate painted layers. Leaves rustle on pointer interaction and keyboard focus; picked berries settle into the tray. These animations respect reduced motion. The stand frame remains a CSS prop.

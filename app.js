@@ -18,6 +18,7 @@
     return '<img class="produce" src="assets/strawberry.png" alt="">';
   }
   function fruit(n) { return Array.from({length:n}, berry).join(''); }
+  function tray(n, id = '') { return '<div class="painted-tray"><img class="tray-art" src="assets/harvest-tray.png" alt=""><div class="tray-produce"'+(id?' id="'+id+'"':'')+'>'+fruit(n)+'</div></div>'; }
   function action(label, next) { return '<button data-next="'+next+'">'+label+'</button>'; }
   function look(text, target) {
     guide.textContent = text;
@@ -32,15 +33,16 @@
   function show(next) {
     cleanup(); cleanup = () => {};
     stage = next;
+    game.dataset.stage = stage;
     game.classList.remove('arrive');
     if (stage === 'home') {
       game.innerHTML = '<h1>Daisy’s Farm</h1><p>A little harvest. A number to discover.</p>'+action('Play with Daisy','pick')+'<div class="tiles">'+['pick','find','read','trace'].map((s,i)=>'<button data-practice="'+s+'">'+['Pick and Count','Find the Number','Read the Sign','Trace the Sign'][i]+'</button>').join('')+'</div>';
       look('Let’s visit the strawberry patch.');
     } else if (stage === 'pick') {
-      game.innerHTML = '<h2>Pick '+count+' strawberries</h2><div class="harvest"><div class="bed">'+Array.from({length:count},(_,i)=>'<div class="plant"><button class="berry" data-pick="'+i+'" aria-label="Pick strawberry '+(i+1)+'">'+berry()+'</button></div>').join('')+'</div><div><div class="number" id="tally">0</div><div class="tray" id="tray"></div></div></div><div class="actions" id="continue"></div>';
+      game.innerHTML = '<h2>Pick '+count+' strawberries</h2><div class="harvest"><div class="bed" aria-label="Strawberry patch"><img class="soil-art" src="assets/soil-tray.png" alt=""><div class="plants">'+Array.from({length:count},(_,i)=>'<div class="plant" style="--lean:'+(i%2?'-2deg':'2deg')+'"><img class="plant-leaves" src="assets/strawberry-plant.png" alt=""><button class="berry" data-pick="'+i+'" aria-label="Pick strawberry '+(i+1)+'">'+berry()+'</button></div>').join('')+'</div></div><div class="number" id="tally" aria-label="Strawberries picked">0</div>'+tray(0,'tray')+'</div><div class="actions" id="continue"></div>';
       look('Tap a ripe strawberry.', '[data-pick]');
     } else if (stage === 'stand') {
-      game.innerHTML = '<h2>At the farm stand</h2><div class="stand"><div class="tray">'+fruit(count)+'</div></div><div class="actions">'+action('Find the sign','find')+'</div>';
+      game.innerHTML = '<h2>At the farm stand</h2><div class="stand">'+tray(count)+'</div><div class="actions">'+action('Find the sign','find')+'</div>';
       look('Let’s label our harvest.');
     } else if (stage === 'find') {
       const wrong = count === 5 ? 2 : count+1;
@@ -57,7 +59,7 @@
       game.innerHTML = '<h2>Trace the '+count+'</h2><svg id="trace" viewBox="0 0 250 300" aria-label="Trace number '+count+'"><path class="trace-base" d="'+paths[count]+'"/><path class="trace-progress" d="'+paths[count]+'"/></svg><div class="actions">'+action('Show me','demo')+action('Finish together','done')+'</div>';
       tracing(); look('Follow the golden trail.', '#trace');
     } else if (stage === 'done') {
-      game.innerHTML = '<h2>You made a '+count+'!</h2><div class="number">'+count+'</div><div class="tray">'+fruit(count)+'</div><div class="actions">'+action('Play again','restart')+'</div>';
+      game.innerHTML = '<h2>You made a '+count+'!</h2><div class="number">'+count+'</div>'+tray(count)+'<div class="actions">'+action('Play again','restart')+'</div>';
       look('Ready for another harvest?');
     }
     requestAnimationFrame(()=>game.classList.add('arrive'));
@@ -86,13 +88,32 @@
     };
     cleanup=()=>clearInterval(timer);
   }
+  function rustle(plant) {
+    if (!plant || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const leaves=plant.querySelector('.plant-leaves');
+    leaves.getAnimations().forEach(animation=>animation.cancel());
+    leaves.animate([
+      {transform:'rotate(0deg)'}, {transform:'rotate(-3deg)'},
+      {transform:'rotate(2deg)'}, {transform:'rotate(-1deg)'}, {transform:'rotate(0deg)'}
+    ], {duration:650,easing:'ease-in-out'});
+  }
+  game.addEventListener('pointerover', e=>{
+    const plant=e.target.closest('.plant');
+    if(plant && !plant.contains(e.relatedTarget)) rustle(plant);
+  });
+  game.addEventListener('pointerdown', e=>rustle(e.target.closest('.plant')));
+  game.addEventListener('focusin', e=>rustle(e.target.closest('.plant')));
   game.addEventListener('click', e=>{
     const button=e.target.closest('button'); if(!button) return;
     if(button.dataset.practice){standalone=true;picked=new Set();show(button.dataset.practice);return;}
     if(button.dataset.pick!==undefined){
       const id=button.dataset.pick;if(picked.has(id))return;picked.add(id);button.disabled=true;
       document.querySelector('#tally').textContent=picked.size;
-      document.querySelector('#tray').innerHTML=fruit(picked.size);
+      const plant=button.closest('.plant');
+      rustle(plant);
+      const trayFruit=document.querySelector('#tray');
+      trayFruit.insertAdjacentHTML('beforeend',berry());
+      trayFruit.lastElementChild.classList.add('just-picked');
       if(picked.size===count){game.querySelector('h2').textContent=count+' strawberries!';document.querySelector('#continue').innerHTML=action(standalone?'Play again':'Take to the stand',standalone?'restart':'stand');look('Take your tray to the stand.','#continue button');}
       return;
     }
