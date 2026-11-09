@@ -306,3 +306,14 @@ main { min-height:calc(100svh - 125px); padding:32px 24px; align-items:center; }
 .grass-tone-1 { fill:var(--grass-mid); }
 .grass-tone-2 { fill:var(--grass-light); }
 .grass-tone-3 { fill:var(--grass-tip); }
+
+/* Preserve scrolling and pinch zoom while avoiding browser gestures on play. */
+#game[data-stage]:not([data-stage="home"]) {
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+  touch-action:manipulation;
+}
+#game[data-stage]:not([data-stage="home"]) img {
+  -webkit-user-drag:none;
+}

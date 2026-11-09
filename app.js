@@ -3,7 +3,7 @@
   const daisy = document.querySelector('#daisy');
   const guide = document.querySelector('#guide');
   const maxCount = 10;
-  let count = 3;
+  let count = 0;
   let picked = new Set();
   let stage = 'home';
   let activity = 'pick';
@@ -254,9 +254,26 @@
   game.addEventListener('pointercancel',finishDrag);
   game.addEventListener('lostpointercapture',finishDrag);
 
+  // Keep browser menus and native drag out of active rounds.
+  for (const eventName of ['contextmenu', 'dragstart']) {
+    game.addEventListener(eventName, event => {
+      if (stage !== 'home') event.preventDefault();
+    });
+  }
+
+  function startRound(gameName) {
+    const available = count ? maxCount - 1 : maxCount;
+    const roll = 1 + Math.floor(Math.random() * available);
+    // Skip the previous number so every new round feels different.
+    count = count && roll >= count ? roll + 1 : roll;
+    activity = gameName;
+    picked = new Set();
+    show(activity);
+  }
+
   game.addEventListener('click', e=>{
     const button=e.target.closest('button'); if(!button) return;
-    if(button.dataset.practice){activity=button.dataset.practice;picked=new Set();show(activity);return;}
+    if(button.dataset.practice){startRound(button.dataset.practice);return;}
     if(button.dataset.pick!==undefined){
       if(!suppressPickClick || e.detail===0) collectBerry(button);
       return;
@@ -272,9 +289,9 @@
       }
       return;
     }
-    let next=button.dataset.next;
+    const next=button.dataset.next;
     if(next==='demo')return;
-    if(next==='restart'){count=count%maxCount+1;picked=new Set();next=activity;}
+    if(next==='restart'){startRound(activity);return;}
     if(next) show(next);
   });
   document.querySelector('#home').onclick=()=>show('home');
