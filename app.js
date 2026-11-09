@@ -3,6 +3,7 @@
   const daisy = document.querySelector('#daisy');
   const guide = document.querySelector('#guide');
   const maxCount = 10;
+  const countSpeech = window.speechSynthesis;
   let count = 0;
   let picked = new Set();
   let stage = 'home';
@@ -88,6 +89,7 @@
     guide.textContent = text;
   }
   function show(next) {
+    if (next !== 'done') countSpeech?.cancel();
     if(drag) finishDrag({pointerId:drag.id});
     cleanup(); cleanup = () => {};
     stage = next;
@@ -133,11 +135,28 @@
     function placeFinger(at) { const p=base.getPointAtLength(at);finger.setAttribute('cx',p.x);finger.setAttribute('cy',p.y); }
 
     let distance=0, pointer=null, timer=null;
+    let zeroStarted = false;
     progress.style.strokeDasharray=length;
     progress.style.strokeDashoffset=length;
     function move(event) {
       if(event.pointerId!==pointer) return;
       const p=new DOMPoint(event.clientX,event.clientY).matrixTransform(svg.getScreenCTM().inverse());
+      // Start the zero at its marker, with the same finger or after lifting.
+      // A loop can be traced in either direction.
+      if(count===10 && stroke===1 && !zeroStarted) {
+        const top=base.getPointAtLength(0);
+        const dx=p.x-top.x;
+        if(Math.hypot(dx,p.y-top.y)>40 || Math.abs(dx)<7) return;
+        zeroStarted=true;
+        if(dx>0) {
+          const clockwise='M170 40 C240 40 240 260 170 260 C100 260 100 40 170 40';
+          base.setAttribute('d',clockwise);
+          progress.setAttribute('d',clockwise);
+          length=base.getTotalLength();
+          progress.style.strokeDasharray=length;
+          progress.style.strokeDashoffset=length;
+        }
+      }
       // Follow the nearest point ahead instead of requiring a fixed number of events.
       // A bounded window prevents jumping across the numeral to its endpoint.
       let nearest=distance, error=Infinity;
@@ -153,12 +172,13 @@
       placeFinger(distance);
       if(distance>=length) {
         if(stroke===bases.length-1) {show('done');return;}
-        // Lift and start the next digit; never draw a connecting line in 10.
-        pointer=null; stroke++; base=bases[stroke]; progress=progresses[stroke];
+        // Move the marker to the next digit without drawing a connecting line.
+        stroke++; base=bases[stroke]; progress=progresses[stroke];
         length=base.getTotalLength(); distance=0;
         const nextStart=base.getPointAtLength(0), marker=svg.querySelector('.trace-start');
         marker.setAttribute('cx',nextStart.x);marker.setAttribute('cy',nextStart.y);
         placeFinger(0);
+        setGuide('Now trace around the zero.');
       }
     }
     svg.onpointerdown=e=>{clearInterval(timer);progress.style.strokeDashoffset=length-distance;placeFinger(distance);pointer=e.pointerId;svg.setPointerCapture(pointer);move(e);};
@@ -191,11 +211,25 @@
   });
   game.addEventListener('pointerdown', e=>rustle(e.target.closest('.plant')));
   game.addEventListener('focusin', e=>rustle(e.target.closest('.plant')));
+  function sayPickedCount(total) {
+    if (!countSpeech || typeof SpeechSynthesisUtterance !== 'function') return;
+    const australianVoices = countSpeech.getVoices().filter(voice => voice.lang === 'en-AU');
+    const voice = australianVoices.find(voice => /Karen|Matilda|Catherine/i.test(voice.name))
+      || australianVoices[0];
+    const utterance = new SpeechSynthesisUtterance(String(total));
+    utterance.lang = 'en-AU';
+    if (voice) utterance.voice = voice;
+    utterance.rate = 0.84;
+    utterance.pitch = 1.05;
+    countSpeech.speak(utterance);
+  }
+
   function collectBerry(button) {
     if(stage!=='pick' || picked.has(button.dataset.pick)) return;
     picked.add(button.dataset.pick);
     button.disabled=true;
     game.querySelector('#tally').textContent=picked.size;
+    sayPickedCount(picked.size);
     rustle(button.closest('.plant'));
     const fruitLayer=game.querySelector('#harvest-basket .basket-fruit');
     fruitLayer.insertAdjacentHTML('beforeend',berry());
