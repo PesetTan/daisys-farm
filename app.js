@@ -211,12 +211,12 @@
   });
   game.addEventListener('pointerdown', e=>rustle(e.target.closest('.plant')));
   game.addEventListener('focusin', e=>rustle(e.target.closest('.plant')));
-  function sayPickedCount(total) {
+  function sayNumber(number) {
     if (!countSpeech || typeof SpeechSynthesisUtterance !== 'function') return;
     const australianVoices = countSpeech.getVoices().filter(voice => voice.lang === 'en-AU');
     const voice = australianVoices.find(voice => /Karen|Matilda|Catherine/i.test(voice.name))
       || australianVoices[0];
-    const utterance = new SpeechSynthesisUtterance(String(total));
+    const utterance = new SpeechSynthesisUtterance(String(number));
     utterance.lang = 'en-AU';
     if (voice) utterance.voice = voice;
     utterance.rate = 0.84;
@@ -229,7 +229,7 @@
     picked.add(button.dataset.pick);
     button.disabled=true;
     game.querySelector('#tally').textContent=picked.size;
-    sayPickedCount(picked.size);
+    sayNumber(picked.size);
     rustle(button.closest('.plant'));
     const fruitLayer=game.querySelector('#harvest-basket .basket-fruit');
     fruitLayer.insertAdjacentHTML('beforeend',berry());
@@ -313,8 +313,10 @@
       return;
     }
     if(button.dataset.answer){
-      if(Number(button.dataset.answer)===count){show('done');}
-      else {
+      if (Number(button.dataset.answer) === count) {
+        sayNumber(count);
+        show('done');
+      } else {
         button.classList.remove('try-again');
         // Restart the feedback even when the same number is tapped twice.
         void button.offsetWidth;
