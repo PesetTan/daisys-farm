@@ -3,7 +3,10 @@
   const daisy = document.querySelector('#daisy');
   const guide = document.querySelector('#guide');
   const maxCount = 10;
-  const countSpeech = window.speechSynthesis;
+  const numberAudio = new Audio();
+  const pendingNumbers = [];
+  let playingNumber = false;
+  let audioRound = 0;
   let count = 0;
   let picked = new Set();
   let stage = 'home';
@@ -89,7 +92,12 @@
     guide.textContent = text;
   }
   function show(next) {
-    if (next !== 'done') countSpeech?.cancel();
+    if (next !== 'done') {
+      audioRound++;
+      pendingNumbers.length = 0;
+      playingNumber = false;
+      numberAudio.pause();
+    }
     if(drag) finishDrag({pointerId:drag.id});
     cleanup(); cleanup = () => {};
     stage = next;
@@ -211,17 +219,26 @@
   });
   game.addEventListener('pointerdown', e=>rustle(e.target.closest('.plant')));
   game.addEventListener('focusin', e=>rustle(e.target.closest('.plant')));
+  function playNextNumber() {
+    if (playingNumber || !pendingNumbers.length) return;
+    const round = audioRound;
+    playingNumber = true;
+    numberAudio.src = 'assets/voice/' + pendingNumbers.shift() + '.wav';
+    numberAudio.play().catch(() => {
+      if (round !== audioRound) return;
+      playingNumber = false;
+      playNextNumber();
+    });
+  }
+
+  numberAudio.addEventListener('ended', () => {
+    playingNumber = false;
+    playNextNumber();
+  });
+
   function sayNumber(number) {
-    if (!countSpeech || typeof SpeechSynthesisUtterance !== 'function') return;
-    const australianVoices = countSpeech.getVoices().filter(voice => voice.lang === 'en-AU');
-    const voice = australianVoices.find(voice => /Karen|Matilda|Catherine/i.test(voice.name))
-      || australianVoices[0];
-    const utterance = new SpeechSynthesisUtterance(String(number));
-    utterance.lang = 'en-AU';
-    if (voice) utterance.voice = voice;
-    utterance.rate = 0.84;
-    utterance.pitch = 1.05;
-    countSpeech.speak(utterance);
+    pendingNumbers.push(number);
+    playNextNumber();
   }
 
   function collectBerry(button) {
